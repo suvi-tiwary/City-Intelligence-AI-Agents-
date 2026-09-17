@@ -1,9 +1,10 @@
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage , AIMessage , ToolMessage
-from langchain.tools import tool
+from langchain_core.tools import tool
 from tavily import TavilyClient
 import os
 import requests
+from langchain_mistralai import ChatMistralAI
 
 load_dotenv()
 
@@ -49,7 +50,7 @@ def get_news(city:str)->str:
     tavily_search = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
     response=tavily_search.search(
-        max_results=2,
+        max_results=1,
         search_depth="basic",
         query=f"{city}"
     )
@@ -70,4 +71,40 @@ def get_news(city:str)->str:
 
 # res = get_news.invoke({'city':"jaipur"})
 # print(res)
+
+llm = ChatMistralAI()
+
+llm_with_tools = llm.bind_tools([get_weather,get_news])
+messages =[]
+tools={
+    "get_weather":get_weather,
+    "get_news":get_news
+}
+
+print("123123 WELCOME TO CITY INTELLIGENCE SYSTEM 321321")
+print("Press exit ")
+
+while True:
+    query=input("You : ")
+    messages.append(HumanMessage(query))
+
+    while True:
+        result = llm_with_tools.invoke(messages)
+        messages.append(result)
+
+        if result.tool_calls:
+            for tool_calls in result.tool_calls:
+                tool_name = tool_calls["name"]
+
+            confirm = input(f"Want to use this tool {tool_name}. say (Y/N)")
+            if confirm=="N":
+                print('Tool access denied')
+                break
+            else:
+            response = tools[tool_name].invoke(tool_calls)  
+
+
+    
+
+
 
