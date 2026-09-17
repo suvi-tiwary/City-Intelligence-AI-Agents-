@@ -38,5 +38,36 @@ def get_weather(city:str)->str:
         f"Visibility: {visibility / 1000} km"
     )
 
-result = get_weather.invoke({"city":"Raxaul"})
-print(result)
+# result = get_weather.invoke({"city":"Raxaul"})
+# print(result)
+
+@tool
+def get_news(city:str)->str:
+    """
+    Get the Lastest news about your personalized city
+    """
+    tavily_search = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
+
+    response=tavily_search.search(
+        max_results=2,
+        search_depth="basic",
+        query=f"{city}"
+    )
+
+    results = response["results"]
+    news=[]
+    for result in results:
+        title=result.get("title")
+        discription=result.get("content")
+        url = result.get("url")
+
+        news.append(
+             f"Title : {title} \n"
+             f"Description : {discription} \n"
+             f"Url : {url}\n"
+        )
+    return "\n\n".join(news) 
+
+# res = get_news.invoke({'city':"jaipur"})
+# print(res)
+
