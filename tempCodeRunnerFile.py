@@ -109,6 +109,10 @@ while True:
             confirm = input(f"Agents Want to use this tool {tool_name}. Approve (y/n) ")
             if confirm.lower() == "n":
                 print("Tool access denied")
+                messages.append(ToolMessage(
+                    content="Tool access denied by the user.",
+                    tool_call_id=tool_call["id"]
+                ))
                 continue
 
             tool_result = tools[tool_name].invoke(tool_arg)

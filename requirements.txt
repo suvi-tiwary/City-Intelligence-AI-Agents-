@@ -4,3 +4,4 @@ langchain_community
 Tavily
 dotenv
 langchain_mistralai 
+langchain_groq
